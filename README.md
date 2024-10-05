@@ -14,3 +14,41 @@ Prerequisites:
 Three VMs with a Linux distribution like Ubuntu 22.04 or CentOS 7+.
 Ansible installed on a control machine or one of the VMs.
 SSH access configured between the control machine and the VMs.
+
+
+Assign right IPs
+
+Run the setup playbook to prepare all VMs:
+
+ansible-playbook -i inventory.ini k8s-setup.yml
+
+Then, run the master node initialization playbook:
+
+ansible-playbook -i inventory.ini k8s-master.yml
+
+Finally, run the playbook to join the worker nodes:
+
+ansible-playbook -i inventory.ini join-workers.yml
+
+Verify the Cluster:
+After the worker nodes have joined, you can verify the cluster setup by SSHing into the master node and running:
+
+kubectl get nodes
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
