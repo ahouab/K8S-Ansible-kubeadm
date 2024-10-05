@@ -1,5 +1,5 @@
 # K8S-Ansible-kubeadm
-install from scratch a Kubernetes cluster on 3 VM using Ansible
+Install from scratch a Kubernetes cluster on 3 VM using Ansible
 
 To install a Kubernetes cluster from scratch on three virtual machines using Ansible, follow these key steps. This method assumes you have three VMs ready to go and that Ansible is installed on your control machine (or one of the VMs).
 
@@ -34,6 +34,23 @@ Verify the Cluster:
 After the worker nodes have joined, you can verify the cluster setup by SSHing into the master node and running:
 
 kubectl get nodes
+
+
+*******************
+In case of repository debian problem
+
+Do this:
+
+sudo apt update
+sudo apt install apt-transport-https curl
+
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+
+
+Create a new file in the /etc/apt/sources.list.d/ directory:
+
+echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
 
 
 
