@@ -1,0 +1,6 @@
+---
+- hosts: workers
+  become: yes
+  tasks:
+    - name: Join Kubernetes cluster
+      command: "{{ hostvars['k8s-master']['join_command']['stdout'] }}"
