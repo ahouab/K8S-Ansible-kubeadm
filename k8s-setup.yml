@@ -1,0 +1,65 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Install dependencies
+      apt: 
+        name: 
+          - apt-transport-https
+          - curl
+          - docker.io
+          - gnupg2
+          - software-properties-common
+        update_cache: yes
+        state: present
+
+    - name: Disable swap
+      command: swapoff -a
+      ignore_errors: yes
+
+    - name: Ensure swap is disabled permanently
+      replace:
+        path: /etc/fstab
+        regexp: '^\s*swap\s'
+        replace: '#swap was disabled by Ansible'
+
+    - name: Load necessary kernel modules
+      modprobe:
+        name: "{{ item }}"
+      with_items:
+        - br_netfilter
+        - overlay
+
+    - name: Ensure kernel modules are loaded on boot
+      copy:
+        dest: /etc/modules-load.d/kubernetes.conf
+        content: |
+          br_netfilter
+          overlay
+
+    - name: Set sysctl parameters
+      sysctl:
+        name: "{{ item.key }}"
+        value: "{{ item.value }}"
+        sysctl_set: yes
+        state: present
+        reload: yes
+      with_items:
+        - { key: 'net.bridge.bridge-nf-call-iptables', value: 1 }
+        - { key: 'net.ipv4.ip_forward', value: 1 }
+        - { key: 'net.bridge.bridge-nf-call-ip6tables', value: 1 }
+
+    - name: Add Kubernetes APT repository
+      apt_repository:
+        repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+        state: present
+        filename: kubernetes
+
+    - name: Install kubelet, kubeadm, and kubectl
+      apt:
+        name:
+          - kubelet
+          - kubeadm
+          - kubectl
+        state: present
+        update_cache: yes
